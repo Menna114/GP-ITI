@@ -69,4 +69,3 @@ variable "subnets" {
     }
   ]
 }
-
