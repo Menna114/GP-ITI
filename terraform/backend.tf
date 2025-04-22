@@ -1,6 +1,8 @@
+# Root module - backend.tf
+
 terraform {
   backend "s3" {
-    bucket = "bucket-devops-project-gp"
+    bucket = "engy-bucket-project-gp"
     key    = "devops-terraform.tfstate"
     region = "us-east-1"
   }
