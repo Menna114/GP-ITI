@@ -1,1 +1,6 @@
 .terraform/
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+.terraformc
+.terraform.d
