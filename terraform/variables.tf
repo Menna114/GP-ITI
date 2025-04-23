@@ -70,3 +70,20 @@ variable "subnets" {
   ]
 }
 
+variable "eks_desired_size" {
+  type        = number
+  default     = 3
+  
+}
+
+variable "eks_max_size" {
+  type        = number
+  default     = 3
+  
+}
+
+variable "eks_min_size" {
+  type        = number
+  default     = 1
+ 
+}
