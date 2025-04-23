@@ -10,7 +10,7 @@ module "network" {
 
 module "eks" {
   source       = "./eks"
-  subnet_ids   = module.network.private_subnet_ids #subnet beta3tkm 
+  subnets      = module.network.private_subnet_ids
   desired_size = var.eks_desired_size
   max_size     = var.eks_max_size
   min_size     = var.eks_min_size
