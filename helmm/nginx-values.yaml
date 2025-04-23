@@ -1,0 +1,12 @@
+image:
+  registry: 661013218527.dkr.ecr.us-east-1.amazonaws.com
+  repository: node-app-jenkins2
+  tag: latest
+  pullPolicy: Always
+
+imagePullSecrets:
+  - name: ecr-credentials
+
+service:
+  type: LoadBalancer
+  port: 8080
