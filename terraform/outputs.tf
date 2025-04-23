@@ -10,7 +10,7 @@ output "private_subnet_ids" {
 
 output "public_subnet_ids" {
   description = "Public subnet IDs from the network module"
-  value       = module.network.public_subnet_ids
+  value       =    module.network.public_subnet_ids
 }
 
 output "internet_gateway_id" {
