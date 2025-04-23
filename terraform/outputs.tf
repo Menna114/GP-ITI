@@ -35,5 +35,5 @@ output "private_route_table_id" {
 
 output "public_route_table_id" {
   description = "Public route table ID from the network module"
-  value       = module.network.public_route_table_id
+  value          = module.network.public_route_table_id
 }
