@@ -66,7 +66,7 @@ variable "subnets" {
       cidr_block = "192.168.160.0/19"
       az         = "us-east-1c"
       type       = "private"
-    }
+     }
   ]
 }
 

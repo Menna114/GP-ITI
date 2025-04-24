@@ -52,3 +52,8 @@ output "eks_node_group_arn" {
   description = "ARN of the EKS node group"
   value       = module.eks.node_group_arn
 }
+
+output "aws_ecr_repository" {
+  value = module.ecr.aws_ecr_repository
+  
+}
