@@ -22,3 +22,6 @@ module "ebs" {
   eks_oidc_provider_url  = module.eks.oidc_provider_url
   node_group_depends_on  = module.eks.node_group_arn
 }
+module "ecr" {
+  source                 = "./ecr"
+}
