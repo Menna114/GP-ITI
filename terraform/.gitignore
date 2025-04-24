@@ -1,4 +1,4 @@
-file.txt
+
 .terraform/
 *.tfstate
 *.tfstate.*
