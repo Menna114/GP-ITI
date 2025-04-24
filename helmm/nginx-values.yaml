@@ -33,3 +33,45 @@ serviceAccount:
   create: true
   annotations:
     eks.amazonaws.com/role-arn: "arn:aws:iam::661013218527:role/ecr-access-role"
+
+
+# {
+#   # Override the image settings in the chart to use your custom Docker image
+# controller:
+#   image:
+#     registry: 661013218527.dkr.ecr.us-east-1.amazonaws.com
+#     repository: node-app-jenkins2
+#     tag: latest
+#     pullPolicy: Always
+
+#   # installPlugins:
+#   #   - git
+#   #   - github
+#   #   - github-api
+#   #   - github-branch-source
+#   #   - docker-workflow
+#   #   - kubernetes
+#   #   - terraform
+#   #   - aws-java-sdk
+#   #   - credentials
+#   #   - plain-credentials
+#   #   - ssh-credentials
+#   #   - matrix-auth
+#   #   - configuration-as-code
+#   #   - pipeline-github-lib
+#   #   - antisamy-markup-formatter
+#   #   - mailer
+#   #   - ws-cleanup
+#   #   - workflow-job
+#   #   - workflow-cps
+#   #   - workflow-aggregator
+#   #   - pipeline-stage-view
+#   #   - workflow-basic-steps
+#   #   - workflow-durable-task-step
+#   #   - dark-theme
+
+#   service:
+#     type: LoadBalancer
+#     port: 8080
+
+# }
