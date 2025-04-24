@@ -15,3 +15,10 @@ module "eks" {
   max_size     = var.eks_max_size
   min_size     = var.eks_min_size
 }
+
+module "ebs" {
+  source                 = "./ebs"
+  eks_cluster_name       = module.eks.cluster_name
+  eks_oidc_provider_url  = module.eks.oidc_provider_url
+  node_group_depends_on  = module.eks.node_group_arn
+}

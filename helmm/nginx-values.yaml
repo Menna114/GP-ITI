@@ -1,11 +1,15 @@
-image:
-  registry: 661013218527.dkr.ecr.us-east-1.amazonaws.com
-  repository: node-app-jenkins2
-  tag: latest
-  pullPolicy: Always
+controller:
+  image:
+    registry: docker.io
+    repository: jenkins/jenkins
+    pullPolicy: Always
+    tag: "2.452.2-jdk21"
 
-imagePullSecrets:
-  - name: ecr-credentials
+persistence:
+  enabled: true
+  storageClass: gp2  
+  size: 8Gi
+
 
 service:
   type: LoadBalancer

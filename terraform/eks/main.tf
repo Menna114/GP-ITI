@@ -4,7 +4,7 @@ resource "aws_eks_cluster" "cluster" {
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {
-    subnet_ids              = var.subnets   # hatghar hasb el private beta3 engy
+    subnet_ids              = var.subnets  
     endpoint_private_access = true
     endpoint_public_access  = true
   }
@@ -92,3 +92,4 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.ec2_readonly
   ]
 }
+
