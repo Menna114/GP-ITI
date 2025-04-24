@@ -1,16 +1,35 @@
-controller:
-  image:
-    registry: docker.io
-    repository: jenkins/jenkins
-    pullPolicy: Always
-    tag: "2.452.2-jdk21"
+image:
+  registry: 661013218527.dkr.ecr.us-east-1.amazonaws.com
+  repository: node-app-jenkins2
+  tag: latest
+  pullPolicy: Always
 
-persistence:
-  enabled: true
-  storageClass: gp2  
-  size: 8Gi
-
+imagePullSecrets:
+  - name: ecr-credentials
 
 service:
   type: LoadBalancer
   port: 8080
+
+resources:
+  requests:
+    cpu: "1000m"
+    memory: "2048Mi"
+  limits:
+    cpu: "2000m"
+    memory: "4096Mi"
+
+
+persistence:
+  enabled: true
+  storageClass: "gp2"
+  size: "8Gi"
+  accessModes:
+    - ReadWriteOnce
+  annotations: {}
+
+
+serviceAccount:
+  create: true
+  annotations:
+    eks.amazonaws.com/role-arn: "arn:aws:iam::661013218527:role/ecr-access-role"
