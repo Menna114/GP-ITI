@@ -1,76 +1,85 @@
-pipeline {
-    agent any
-    tools { 
-        terraform 'terraform' 
-    } 
-    environment {
-        AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
-        AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
-        AWS_DEFAULT_REGION    = 'us-east-1'
-        DOCKER_IMAGE_TAG      = 'latest'
-    }
+podTemplate(
+    label: 'jenkins_label',
+    containers: [
+        containerTemplate(
+            name: 'dockerimage',
+            image: 'yousra000/dind-aws-terraform:latest',
+            command: 'sleep',
+            args: '9999999',
+            ttyEnabled: true
+        )
+    ],
+    volumes: [
+        hostPathVolume(
+            mountPath: '/var/run/docker.sock',
+            hostPath: '/var/run/docker.sock'
+        )
+    ]
+) {
+    node('jenkins_label') {
+        env.AWS_DEFAULT_REGION = 'us-east-1'
+        env.DOCKER_IMAGE_TAG = 'latest'
 
-    options {
-        skipDefaultCheckout(false)
-        timeout(time: 30, unit: 'MINUTES')
-        buildDiscarder(logRotator(numToKeepStr: '10'))
-    }
-
-    stages {
-        // STAGE 1: Checkout SCM
-        stage('Checkout') {
-            steps {
-                checkout scm
+        stage('Prepare Environment') {
+            container('dockerimage') {
+                sh '''
+                    echo "=== Versions ==="
+                    docker --version
+                    aws --version
+                    terraform --version
+                '''
             }
         }
 
-        // STAGE 2: Terraform Init & Output
-        stage('Get Terraform Output') {
-            steps {
-                dir('terraform') {
-                    script {
-                        // Initialize Terraform (if needed)
-                        sh 'terraform init'
+        stage('Run Pipeline') {
+            container('dockerimage') {
+                withCredentials([
+                    string(credentialsId: 'AWS_ACCESS_KEY_ID', variable: 'AWS_ACCESS_KEY_ID'),
+                    string(credentialsId: 'AWS_SECRET_ACCESS_KEY', variable: 'AWS_SECRET_ACCESS_KEY')
+                ]) {
+                    sh '''
+                        aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+                        aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+                        aws configure set region $AWS_DEFAULT_REGION
+                        aws sts get-caller-identity
+                    '''
 
-                        // Fetch ECR registry URL
-                        REGISTRY = sh(
+                    dir('terraform') {
+                        sh 'terraform init'
+                        env.REGISTRY = sh(
                             script: 'terraform output -raw aws_ecr_repository | cut -d "/" -f1',
                             returnStdout: true
                         ).trim()
-                        
-                        // Fetch ECR repository name
-                        REPOSITORY = sh(
+                        env.REPOSITORY = sh(
                             script: 'terraform output -raw aws_ecr_repository | cut -d "/" -f2',
                             returnStdout: true
                         ).trim()
-
-                        env.REPOSITORY = REPOSITORY
-                        env.REGISTRY = REGISTRY
                     }
-                }
-            }
-        }
 
-        // STAGE 3: Build & Push Docker Image
-        stage('Build and Push Docker Image') {
-            steps {
-                dir('nodeapp') {
-                    script {
-                        // Login to ECR
-                        sh """
-                            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | \
-                            docker login --username AWS --password-stdin ${env.REGISTRY}
-                        """
+                    dir('nodeapp') {
+                        script {
+                            echo "REGISTRY=${env.REGISTRY}"
+                            echo "REPOSITORY=${env.REPOSITORY}"
 
-                        // Build and push
-                        sh """
-                            docker build -t ${env.REGISTRY}/${env.REPOSITORY}:${DOCKER_IMAGE_TAG} .
-                            docker push ${env.REGISTRY}/${env.REPOSITORY}:${DOCKER_IMAGE_TAG}
-                        """
+                            // AWS ECR login
+                            sh """
+                                aws ecr get-login --region ${env.AWS_DEFAULT_REGION} --no-include-email | \
+                                docker login --username AWS --password-stdin ${env.REGISTRY}
+                            """
+
+                            // Docker build
+                            sh """
+                                docker build -t ${env.REGISTRY}/${env.REPOSITORY}:${env.DOCKER_IMAGE_TAG} .
+                            """
+
+                            // Docker push
+                            sh """
+                                docker push ${env.REGISTRY}/${env.REPOSITORY}:${env.DOCKER_IMAGE_TAG}
+                            """
+                        }
                     }
                 }
             }
         }
     }
 }
-// D0yUEsTuFiBTZ0lQ1w2AaY
