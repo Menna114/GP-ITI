@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+  namespace: nodejs-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      containers:
+        - name: nodejs-app
+          image: 657433765520.dkr.ecr.us-east-1.amazonaws.com/node-app-jenkins2:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: MYSQL_HOST
+              value: "mysql-service"
+            - name: MYSQL_USER
+              value: "admin"  # Same as the MySQL user
+            - name: MYSQL_PASSWORD
+              value: "secretpassword"  # Same as the MySQL password
+            - name: REDIS_HOST
+              value: "redis-service"
