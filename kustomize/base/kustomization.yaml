@@ -1,0 +1,14 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - namespace.yml
+  - deployment/dep-node.yml
+  - deployment/service-node.yml
+  - mysql/mysql-statefullset.yml
+  - mysql/mysql-service.yml
+  - mysql/mysql-pv.yml
+  - mysql/mysql-pvc.yml
+  - redis/redis-dep.yml
+  - redis/redis-service.yml
+  - redis/redis-pv.yml
+  - redis/redis-pvc.yml
