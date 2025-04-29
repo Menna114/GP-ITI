@@ -17,6 +17,11 @@ variable "min_size" {
 }
 
 variable "subnets" {
+  description = "List of private & public subnet IDs"
+  type        = list(string)
+}
+
+variable "subnets-private" {
   description = "List of private subnet IDs"
   type        = list(string)
 }

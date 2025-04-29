@@ -14,6 +14,7 @@ resource "aws_eks_cluster" "cluster" {
   ]
 }
 
+
 # Cluster IAM Role
 resource "aws_iam_role" "eks_cluster_role" {
   name = "eks-cluster-role"
@@ -35,6 +36,11 @@ resource "aws_iam_role_policy_attachment" "eks_cluster_AmazonEKSClusterPolicy" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEKSClusterPolicy"
   role       = aws_iam_role.eks_cluster_role.name
 }
+resource "aws_iam_role_policy_attachment" "demo-AmazonEKSServicePolicy" {
+  role       = aws_iam_role.eks_cluster_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEKSServicePolicy"
+}
+
 
 # IAM Role for Worker Nodes
 resource "aws_iam_role" "eks_nodes_role" {
@@ -72,13 +78,23 @@ resource "aws_iam_role_policy_attachment" "ec2_readonly" {
   role       = aws_iam_role.eks_nodes_role.name
 }
 
+resource "aws_iam_role_policy_attachment" "nodes-AmazonS3FullAccess" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
+  role       = aws_iam_role.eks_nodes_role.name
+}
+
+resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryFullAccess" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+  role       = aws_iam_role.eks_nodes_role.name
+}
+
 # EKS Node Group
 resource "aws_eks_node_group" "node_group" {
   cluster_name    = aws_eks_cluster.cluster.name
   node_group_name = "my-node-group"
   node_role_arn   = aws_iam_role.eks_nodes_role.arn
 
-  subnet_ids = var.subnets
+  subnet_ids = var.subnets-private
 
   scaling_config {
     desired_size = var.desired_size
@@ -91,5 +107,6 @@ resource "aws_eks_node_group" "node_group" {
     aws_iam_role_policy_attachment.eks_cni,
     aws_iam_role_policy_attachment.ec2_readonly
   ]
+  instance_types = ["t3.medium"]
 }
 

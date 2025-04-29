@@ -1,4 +1,6 @@
-FROM node:12
+FROM node:slim
+RUN apt update && \
+    apt install mariadb-client -y
 WORKDIR /nodeapp
 COPY package*.json ./
 RUN npm install

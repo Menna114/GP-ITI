@@ -57,3 +57,12 @@ output "aws_ecr_repository" {
   value = module.ecr.aws_ecr_repository
   
 }
+output "external_secrets_role_arn" {
+  description = "IAM Role ARN for External Secrets"
+  value       = module.roles.external_secrets_role_arn
+}
+
+output "eks_oidc_provider_arn" {
+  value = module.eks.oidc_provider_url
+  description = "The ARN of the OpenID Connect provider"
+}

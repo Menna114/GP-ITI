@@ -2,7 +2,6 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: nodejs-app
-  namespace: nodejs-app
 spec:
   replicas: 1
   selector:
@@ -13,17 +12,40 @@ spec:
       labels:
         app: nodejs-app
     spec:
+      serviceAccountName: external-secrets-sa
       containers:
         - name: nodejs-app
-          image: 657433765520.dkr.ecr.us-east-1.amazonaws.com/node-app-jenkins2:latest
+          image: yousra000/nodejs-mysql:latest
           ports:
             - containerPort: 3000
           env:
-            - name: MYSQL_HOST
-              value: "mysql-service"
-            - name: MYSQL_USER
-              value: "admin"  # Same as the MySQL user
-            - name: MYSQL_PASSWORD
-              value: "secretpassword"  # Same as the MySQL password
-            - name: REDIS_HOST
-              value: "redis-service"
+            - name: RDS_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials22
+                  key: hostname
+            - name: RDS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials22
+                  key: username
+            - name: RDS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials22
+                  key: password
+            - name: RDS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials22
+                  key: port
+            - name: REDIS_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials22
+                  key: hostname
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials22
+                  key: port
