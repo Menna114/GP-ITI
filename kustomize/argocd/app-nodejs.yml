@@ -11,7 +11,7 @@ spec:
     path: kustomize/overlays
   destination:
     server: https://kubernetes.default.svc
-    namespace: nodejs-app
+    
   syncPolicy:
     automated:
       prune: true
