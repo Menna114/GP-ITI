@@ -10,7 +10,7 @@ spec:
     targetRevision: main
     path: kustomize/overlays
   destination:
-    server: https://kubernetes.default.svc
+    server: https://F89E6EB0F48432E519169ECF87B22A8F.gr7.us-east-1.eks.amazonaws.com
     
   syncPolicy:
     automated:
