@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: nodejs
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DanaMostafa48/GP-ITI.git
+    targetRevision: main
+    path: kustomize/overlays
+  destination:
+    server: https://F89E6EB0F48432E519169ECF87B22A8F.gr7.us-east-1.eks.amazonaws.com
+    
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+
+

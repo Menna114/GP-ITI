@@ -1,8 +1,9 @@
+
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: redis-pvc
-  namespace: nodejs-app
+  name: mysql-persistent
+  namespace: default
 spec:
   accessModes:
     - ReadWriteOnce

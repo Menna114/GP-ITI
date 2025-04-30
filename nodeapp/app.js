@@ -1,18 +1,18 @@
 const express = require('express')
 const app = express()
-const port = 3000
+const port = process.env.PORT || 3000
 
-const mysql = require('mysql');
+const mysql = require('mysql2');
+
 const pool = mysql.createPool({
   host: process.env.RDS_HOSTNAME,
   user: process.env.RDS_USERNAME,
   password: process.env.RDS_PASSWORD,
-  port: process.env.RDS_PORT,
-  ssl: true,
-  connectionLimit: 10 // adjust as needed
-});
+  port: process.env.RDS_PORT || 3306,
 
+});
 app.get("/db", (req, res) => {
+
   pool.getConnection(function(err, connection) {
     if (err) {
       res.send("db connection failed");
@@ -25,11 +25,10 @@ app.get("/db", (req, res) => {
   });
 });
 
-
 const redis = require('redis');
 const client = redis.createClient({
     host: process.env.REDIS_HOSTNAME,
-    port: process.env.REDIS_PORT,
+    port: process.env.REDIS_PORT || 6379,
 });
 
 client.on('error', err => {

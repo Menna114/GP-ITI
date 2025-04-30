@@ -13,6 +13,14 @@ output "private_subnet_ids" {
   value       = [for subnet in values(aws_subnet.private) : subnet.id]
 }
 
+output "all_subnet_ids" {
+  description = "The IDs of all subnets (public and private)"
+  value       = concat(
+    [for subnet in values(aws_subnet.public) : subnet.id],
+    [for subnet in values(aws_subnet.private) : subnet.id]
+  )
+}
+
 output "internet_gateway_id" {
   description = "The ID of the Internet Gateway"
   value       = aws_internet_gateway.vpc-igw.id
