@@ -1,25 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: nodejs
+  name: my-app
   namespace: argocd
   annotations:
-    argocd-image-updater.argoproj.io/image-list: node=661013218527.dkr.ecr.us-east-1.amazonaws.com/node-app-jenkins2
-    argocd-image-updater.argoproj.io/node.update-strategy: latest
-    argocd-image-updater.argoproj.io/ecr-access-key: "ecr-credentials"
-    argocd-image-updater.argoproj.io/ecr-secret-key: "ecr-credentials"
-    argocd-image-updater.argoproj.io/write-back-method: git
-    argocd-image-updater.argoproj.io/git-branch: main
+    argocd-image-updater.argoproj.io/image-list: myapp=661013218527.dkr.ecr.us-east-1.amazonaws.com/node-app-jenkins2
+    argocd-image-updater.argoproj.io/myapp.update-strategy: newest-build
+
+    argocd-image-updater.argoproj.io/myapp.helm.image-spec: image.repository
+    argocd-image-updater.argoproj.io/myapp.kustomize.image-name: node-app-jenkins2
 spec:
   project: default
   source:
     repoURL: https://github.com/DanaMostafa48/GP-ITI.git
-    targetRevision: main
+    targetRevision: HEAD
     path: kustomize/overlays
   destination:
-    server: https://F89E6EB0F48432E519169ECF87B22A8F.gr7.us-east-1.eks.amazonaws.com
+    server: https://148DC3AB04B06BAA6607C6CEA4028F78.gr7.us-east-1.eks.amazonaws.com
     namespace: default
   syncPolicy:
     automated:
-      prune: true
+      prune: true  # Corrected here ArgoImageUpdaterECRPolicy
       selfHeal: true
+

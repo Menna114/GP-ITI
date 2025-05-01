@@ -23,7 +23,7 @@ spec:
             - name: MYSQL_ROOT_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: mysql-credentials3
+                  name: mysql-credentials4
                   key: MYSQL_ROOT_PASSWORD
           volumeMounts:
             - name: mysql-persistent-storage  # Changed here to match the volumes name

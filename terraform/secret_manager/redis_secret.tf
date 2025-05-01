@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "redis_secret" {
-  name = "redis-credentials3"
+  name = "redis-credentials4"
 }
 
 resource "aws_secretsmanager_secret_version" "redis_secret_version" {

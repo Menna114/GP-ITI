@@ -72,12 +72,6 @@ resource "aws_iam_role_policy_attachment" "eks_cni" {
   role       = aws_iam_role.eks_nodes_role.name
 }
 
-# Allows pulling images from Amazon ECR
-resource "aws_iam_role_policy_attachment" "ec2_readonly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.eks_nodes_role.name
-}
-
 resource "aws_iam_role_policy_attachment" "nodes-AmazonS3FullAccess" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonS3FullAccess"
   role       = aws_iam_role.eks_nodes_role.name
@@ -85,6 +79,10 @@ resource "aws_iam_role_policy_attachment" "nodes-AmazonS3FullAccess" {
 
 resource "aws_iam_role_policy_attachment" "nodes-AmazonEC2ContainerRegistryFullAccess" {
   policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"
+  role       = aws_iam_role.eks_nodes_role.name
+}
+resource "aws_iam_role_policy_attachment" "ecr_access" {
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryFullAccess"  # Use the correct ARN for full ECR access
   role       = aws_iam_role.eks_nodes_role.name
 }
 
@@ -105,8 +103,11 @@ resource "aws_eks_node_group" "node_group" {
   depends_on = [
     aws_iam_role_policy_attachment.eks_worker_node,
     aws_iam_role_policy_attachment.eks_cni,
-    aws_iam_role_policy_attachment.ec2_readonly
+    aws_iam_role_policy_attachment.ecr_access
   ]
   instance_types = ["t3.medium"]
 }
+
+
+
 

@@ -19,7 +19,7 @@ app.get("/db", (req, res) => {
       console.error('Database connection failed: ' + err.stack);
       return;
     }
-    res.send("db connection successful finished pipeline");
+    res.send("db connection successful finished pipelineeeeeeee");
     console.log('Connected to database.');
     connection.release(); // release back to the pool
   });
@@ -40,12 +40,12 @@ app.get('/redis', (req, res) => {
   client.set('foo','bar', (error, rep)=> {                
     if(error){     
 console.log(error);
-      res.send("redis connection failed");                             
+      res.send("redis connectionnnnnnn failed");                             
       return;                
   }                 
   if(rep){                          //JSON objects need to be parsed after reading from redis, since it is stringified before being stored into cache                      
  console.log(rep);
-  res.send("redis is successfuly connected");                 
+  res.send("redis is successfuly connected  ok");                 
  }}) 
   })
   

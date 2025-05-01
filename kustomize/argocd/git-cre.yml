@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: repo-github
+  namespace: argocd
+  labels:
+    argocd.argoproj.io/secret-type: repository
+type: Opaque
+stringData:
+  type: git
+  url: https://github.com/DanaMostafa48/GP-ITI.git
+  username: RGFuYU1vc3RhZmE0OA==
+  password: Z2hwX1BwSnNUNmlvaHpzM3cxZVR6THUwUXFtcXpseDFBWjRSYWlpNg==

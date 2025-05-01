@@ -49,3 +49,59 @@ resource "aws_eks_addon" "ebs_csi" {
   service_account_role_arn = aws_iam_role.ebs_csi.arn
   depends_on               = [var.node_group_depends_on]
 }
+
+######################################################
+resource "aws_iam_policy" "ecr_access" {
+  name        = "ECRAccessPolicy"
+  description = "Policy to allow ECR access for ArgoCD Image Updater"
+
+  policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow",
+          "Action": [
+          "ecr:GetDownloadUrlForLayer",
+          "ecr:BatchGetImage",
+          "ecr:BatchCheckLayerAvailability",
+          "ecr:GetAuthorizationToken",
+          "ecr:DescribeRepositories",
+          "ecr:ListImages",
+          "ecr:DescribeImages"
+        ],
+        Resource = "arn:aws:ecr:us-east-1:661013218527:repository/node-app-jenkins2"
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role" "argocd_ecr_role" {
+  name = "argocd-ecr-access-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${replace(var.eks_oidc_provider_url, "https://", "")}:sub" : "system:serviceaccount:argocd:argocd-service-account"
+          }
+        }
+      }
+    ]
+  })
+}
+
+
+resource "aws_iam_role_policy_attachment" "ecr_access_attach" {
+  role       = aws_iam_role.argocd_ecr_role.name
+  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
+}
+
+
