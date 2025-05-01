@@ -5,4 +5,3 @@
 .terraform.tfstate.lock.info
 .terraformc
 .terraform.d
-argocd-image-updater
