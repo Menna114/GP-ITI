@@ -22,3 +22,5 @@ serviceAccount:
   create: false
 
 
+
+#image-updater
