@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DevOps Demo App</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" />
+  <style>
+    body {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6, #06b6d4, #10b981);
+      background-size: 400% 400%;
+      animation: gradientBG 15s ease infinite;
+    }
+
+    @keyframes gradientBG {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .btn {
+      background: linear-gradient(135deg, #4f46e5, #3b82f6, #06b6d4, #10b981);
+      background-size: 300% 300%;
+      animation: gradientMove 6s ease infinite;
+      color: white;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      font-weight: bold;
+      transition: transform 0.2s ease;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      transform: scale(1.05);
+    }
+
+    @keyframes gradientMove {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    #output {
+      animation: fadeIn 0.3s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="text-white font-sans min-h-screen flex items-center justify-center px-4">
+  <div class="bg-white text-gray-800 rounded-2xl shadow-xl p-8 w-full max-w-2xl transition transform hover:scale-105 duration-300 ease-in-out">
+    <h1 class="text-3xl font-bold mb-4 text-center">🚀 DevOps App Dashboard</h1>
+    <p class="text-center mb-6">Interact with your app services:</p>
+
+    <div class="grid grid-cols-2 gap-4">
+      <button onclick="callApi('/db')" class="btn">Check MySQL</button>
+      <button onclick="callApi('/redis')" class="btn">Check Redis</button>
+      <button onclick="callApi('/redis/set?key=color&value=blue')" class="btn">Set Redis Key</button>
+      <button onclick="callApi('/redis/get?key=color')" class="btn">Get Redis Key</button>
+      <button onclick="callApi('/health')" class="btn col-span-2">Health Check</button>
+    </div>
+
+    <div id="output" class="mt-6 p-4 bg-gray-100 rounded-md text-sm text-black h-24 overflow-auto">
+      Click a button to see results here...
+    </div>
+  </div>
+
+  <script>
+    async function callApi(endpoint) {
+      const output = document.getElementById('output');
+      output.textContent = 'Loading...';
+      try {
+        const res = await fetch(endpoint);
+        const text = await res.text();
+        output.textContent = text;
+      } catch (err) {
+        output.textContent = '❌ Error: ' + err.message;
+      }
+    }
+  </script>
+</body>
+</html>
