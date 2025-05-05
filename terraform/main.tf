@@ -10,7 +10,8 @@ module "network" {
 
 module "eks" {
   source       = "./eks"
-  subnets      = module.network.private_subnet_ids
+  subnets      = module.network.all_subnet_ids
+  subnets-private     = module.network.private_subnet_ids
   desired_size = var.eks_desired_size
   max_size     = var.eks_max_size
   min_size     = var.eks_min_size
@@ -24,4 +25,13 @@ module "ebs" {
 }
 module "ecr" {
   source                 = "./ecr"
+}
+module "roles" {
+  source = "./roles"
+  eks_oidc_provider_url  = module.eks.oidc_provider_url
+  eks_oidc_provider_arn  = module.ebs.eks_oidc_provider_arn
+}
+
+module "secret_manager" {
+  source = "./secret_manager"
 }

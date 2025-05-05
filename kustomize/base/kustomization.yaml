@@ -1,14 +1,16 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - namespace.yml
-  - deployment/dep-node.yml
-  - deployment/service-node.yml
-  - mysql/mysql-statefullset.yml
-  - mysql/mysql-service.yml
-  - mysql/mysql-pv.yml
-  - mysql/mysql-pvc.yml
-  - redis/redis-dep.yml
-  - redis/redis-service.yml
-  - redis/redis-pv.yml
-  - redis/redis-pvc.yml
+  - external-secrets-mysql.yaml
+  - external-secrets-redis.yaml
+  - secrete-store.yaml 
+  - service-account.yaml
+  - dep-node.yml
+  - service-node.yml
+  - mysql-statefullset.yml
+  - mysql-service.yml
+  - mysql-pv.yml
+  - mysql-pvc.yml
+  - redis-dep.yml
+  - redis-service.yml
+

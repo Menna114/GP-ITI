@@ -1,0 +1,17 @@
+repoServer:
+  serviceAccount:
+    create: false
+    name: argo-image-updater  
+
+
+applicationController:
+  serviceAccount:
+    create: false
+    name: argo-image-updater 
+
+server:
+  serviceAccount:
+    create: false
+    name: argo-image-updater 
+
+

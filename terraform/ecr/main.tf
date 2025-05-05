@@ -24,17 +24,13 @@ resource "aws_iam_role" "ecr_access_role" {
   })
 }
 
+
+
 # IAM instance profile
 resource "aws_iam_instance_profile" "ecr_access_profile" {
   name = "ecr-access-instance-profile"
   role = aws_iam_role.ecr_access_role.name
 }
-resource "aws_iam_role_policy_attachment" "ec2_readonly" {
-  policy_arn = "arn:aws:iam::aws:policy/AmazonEC2ContainerRegistryReadOnly"
-  role       = aws_iam_role.ecr_access_role.name
-}
-
-# IAM policy for ECR access
 resource "aws_iam_role_policy" "ecr_pull_policy" {
   name = "ecr-pull-policy"
   role = aws_iam_role.ecr_access_role.id
@@ -60,10 +56,16 @@ resource "aws_iam_role_policy" "ecr_pull_policy" {
           "ecr:CompleteLayerUpload",
           "ecr:BatchCheckLayerAvailability",
           "ecr:PutImage"
+
         ],
         Resource = "*"
-      }
+      },
     ]
   })
+}
+
+
+output "ecr_profile" {
+  value = aws_iam_instance_profile.ecr_access_profile.name
 }
 

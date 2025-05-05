@@ -1,13 +1,24 @@
 pipeline {
     agent {
-        label 'jenkins_slave'
+        kubernetes {
+            label 'jenkins_slave2'
+            yaml """
+apiVersion: v1
+kind: Pod
+spec:
+  containers:
+  - name: dockerimage
+    image: yousra000/dind:latest
+    securityContext:
+      privileged: true
+"""
+        }
     }
 
     environment {
         AWS_ACCESS_KEY_ID     = credentials('AWS_ACCESS_KEY_ID')
         AWS_SECRET_ACCESS_KEY = credentials('AWS_SECRET_ACCESS_KEY')
         AWS_DEFAULT_REGION    = 'us-east-1'
-        DOCKER_IMAGE_TAG      = 'latest'
     }
 
     options {
@@ -25,11 +36,12 @@ pipeline {
 
         stage('Verify Tools') {
             steps {
-                container('dockerimage'){
+                container('dockerimage') {
                     sh '''
-                        echo "=== Versions ==="
+                        echo "=== Tools Version ==="
                         docker --version
                         aws --version
+                        trivy --version
                     '''
                 }
             }
@@ -37,20 +49,31 @@ pipeline {
 
         stage('AWS Configure') {
             steps {
-                container('dockerimage'){
-                sh '''
-                    aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
-                    aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
-                    aws configure set region $AWS_DEFAULT_REGION
-                    aws sts get-caller-identity
-                '''
+                container('dockerimage') {
+                    sh '''
+                        aws configure set aws_access_key_id "$AWS_ACCESS_KEY_ID"
+                        aws configure set aws_secret_access_key "$AWS_SECRET_ACCESS_KEY"
+                        aws configure set region $AWS_DEFAULT_REGION
+                        aws sts get-caller-identity
+                    '''
+                }
             }
+        }
+
+        stage('Set Image Tag') {
+            steps {
+                script {
+                    env.COMMIT_COUNT = sh(script: 'git rev-list --count HEAD', returnStdout: true).trim()
+                    env.COMMIT_HASH = sh(script: 'git rev-parse --short HEAD', returnStdout: true).trim()
+                    env.TAG = "${env.COMMIT_COUNT}.${env.COMMIT_HASH}"
+                    echo "Generated image tag: ${env.TAG}"
+                }
             }
         }
 
         stage('Get ECR Info') {
             steps {
-                container('dockerimage'){
+                container('dockerimage') {
                     script {
                         env.REGISTRY = sh(
                             script: 'aws ecr describe-repositories --query "repositories[0].repositoryUri" --output text | cut -d "/" -f1',
@@ -62,27 +85,51 @@ pipeline {
                             returnStdout: true
                         ).trim()
 
-                        echo "REGISTRY=${env.REGISTRY}"
-                        echo "REPOSITORY=${env.REPOSITORY}"
+                        echo "ECR Registry: ${env.REGISTRY}"
+                        echo "ECR Repository: ${env.REPOSITORY}"
                     }
-            }   }
+                }
+            }
         }
 
-        stage('Build & Push Docker Image') {
+        stage('Build Docker Image') {
             steps {
-                container('dockerimage'){
+                container('dockerimage') {
+                    dir('nodeapp') {
+                        sh """
+                            docker build -t ${env.REGISTRY}/${env.REPOSITORY}:${env.TAG} .
+                        """
+                    }
+                }
+            }
+        }
+
+        stage('Trivy Scan') {
+            steps {
+                container('dockerimage') {
                     dir('nodeapp') {
                         script {
-                            sh """
-                                aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | \
-                                docker login --username AWS --password-stdin ${env.REGISTRY}
-                            """
-
-                            sh """
-                                docker build -t ${env.REGISTRY}/${env.REPOSITORY}:${DOCKER_IMAGE_TAG} .
-                                docker push ${env.REGISTRY}/${env.REPOSITORY}:${DOCKER_IMAGE_TAG}
-                            """
+                            def trivyScan = sh(script: "trivy image --severity HIGH,CRITICAL ${env.REGISTRY}/${env.REPOSITORY}:${env.TAG}", returnStatus: true)
+                            if (trivyScan != 0) {
+                                echo "Trivy found vulnerabilities — continuing anyway."
+                            } else {
+                                echo "Trivy scan passed."
+                            }
                         }
+                    }
+                }
+            }
+        }
+
+        stage('Push Docker Image') {
+            steps {
+                container('dockerimage') {
+                    dir('nodeapp') {
+                        sh """
+                            aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | \
+                            docker login --username AWS --password-stdin ${env.REGISTRY}
+                            docker push ${env.REGISTRY}/${env.REPOSITORY}:${env.TAG}
+                        """
                     }
                 }
             }

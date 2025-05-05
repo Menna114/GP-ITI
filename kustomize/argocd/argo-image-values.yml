@@ -1,0 +1,26 @@
+config:
+  registries: 
+    - name: ECR
+      api_url: https://661013218527.dkr.ecr.us-east-1.amazonaws.com
+      prefix: 661013218527.dkr.ecr.us-east-1.amazonaws.com
+      credentials: ext:/scripts/auth.sh
+      credsexpire: 12h
+      ping: yes
+      default: true
+      insecure: false
+
+authScripts: 
+  enabled: true
+  scripts:
+    auth.sh: |
+      #!/bin/sh
+      HOME=/tmp aws ecr --region us-east-1 get-authorization-token --output text --query 'authorizationData[].authorizationToken' | base64 -d
+
+
+serviceAccount:
+  name: argo-image-updater
+  create: false
+
+
+
+#image-updater

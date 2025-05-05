@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: redis
-  namespace: nodejs-app
+  namespace: default
 spec:
   replicas: 1
   selector:
@@ -18,10 +18,3 @@ spec:
           image: redis:6
           ports:
             - containerPort: 6379
-          volumeMounts:
-            - name: redis-storage
-              mountPath: /data
-      volumes:
-        - name: redis-storage
-          persistentVolumeClaim:
-            claimName: redis-pvc

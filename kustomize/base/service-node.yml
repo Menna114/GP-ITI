@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: nodejs-app-service
-  namespace: nodejs-app
+  namespace: default
 spec:
   selector:
     app: nodejs-app
@@ -10,3 +10,4 @@ spec:
     - protocol: TCP
       port: 80
       targetPort: 3000
+  type: LoadBalancer

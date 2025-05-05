@@ -1,6 +1,6 @@
 resource "aws_vpc" "vpc-devops" {
   cidr_block = var.vpc_cidr
-
+  enable_dns_hostnames = true
   tags = {
     Name = var.vpc_name
   }
@@ -67,18 +67,6 @@ resource "aws_nat_gateway" "k8s-nat" {
   }
 }
 
-resource "aws_route_table" "private" {
-  vpc_id = aws_vpc.vpc-devops.id
-
-  route {
-    cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = aws_nat_gateway.k8s-nat.id
-  }
-
-  tags = {
-    Name = "private"
-  }
-}
 
 resource "aws_route_table" "public" {
   vpc_id = aws_vpc.vpc-devops.id
@@ -90,6 +78,18 @@ resource "aws_route_table" "public" {
 
   tags = {
     Name = "public"
+  }
+}
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.vpc-devops.id
+
+  route {
+    cidr_block     = "0.0.0.0/0"
+    nat_gateway_id = aws_nat_gateway.k8s-nat.id
+  }
+
+  tags = {
+    Name = "private"
   }
 }
 

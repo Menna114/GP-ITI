@@ -1,0 +1,23 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: my-app
+  namespace: argocd
+  annotations:
+    argocd-image-updater.argoproj.io/image-list: "myapp=661013218527.dkr.ecr.us-east-1.amazonaws.com/node-app-jenkins2"
+    argocd-image-updater.argoproj.io/write-back-method: git
+    argocd-image-updater.argoproj.io/git-branch: main
+    argocd-image-updater.argoproj.io/myapp.update-strategy: regexp:^\\d+\\.[a-f0-9]{7}$  # updated line
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/DanaMostafa48/GP-ITI.git
+    targetRevision: HEAD
+    path: kustomize/overlays
+  destination:
+    server: https://148DC3AB04B06BAA6607C6CEA4028F78.gr7.us-east-1.eks.amazonaws.com
+    namespace: default
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

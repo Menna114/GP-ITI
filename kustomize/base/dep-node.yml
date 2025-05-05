@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nodejs-app
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nodejs-app
+  template:
+    metadata:
+      labels:
+        app: nodejs-app
+    spec:
+      serviceAccountName: external-secrets-sa
+      containers:
+        - name: nodejs-app
+          image: 661013218527.dkr.ecr.us-east-1.amazonaws.com/node-app-jenkins2:4.0.1
+          ports:
+            - containerPort: 3000
+          env:
+            - name: RDS_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials4
+                  key: hostname
+            - name: RDS_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials4
+                  key: username
+            - name: RDS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials4
+                  key: password
+            - name: RDS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: mysql-credentials4
+                  key: port
+            - name: REDIS_HOSTNAME
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials4
+                  key: hostname
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: redis-credentials4
+                  key: port
