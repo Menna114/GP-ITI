@@ -105,3 +105,78 @@ resource "aws_iam_role_policy_attachment" "ecr_access_attach" {
 }
 
 
+
+
+
+resource "aws_iam_policy" "aws_lb_controller" {
+  name        = "AWSLoadBalancerControllerIAMPolicy"
+  description = "IAM policy for AWS Load Balancer Controller"
+
+  policy = file("${path.module}/aws-load-balancer-controller-policy.json")
+
+
+}
+
+
+resource "aws_iam_role" "aws_lb_controller_role" {
+  name = "aws-load-balancer-controller-role"
+
+  assume_role_policy = jsonencode({
+    Version = "2012-10-17",
+    Statement = [
+      {
+        Effect = "Allow"
+        Principal = {
+          Federated = aws_iam_openid_connect_provider.eks.arn
+        }
+        Action = "sts:AssumeRoleWithWebIdentity"
+        Condition = {
+          StringEquals = {
+            "${replace(var.eks_oidc_provider_url, "https://", "")}:sub" : "system:serviceaccount:kube-system:aws-load-balancer-controller"
+          }
+        }
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "aws_lb_controller_attach" {
+  role       = aws_iam_role.aws_lb_controller_role.name
+  policy_arn = aws_iam_policy.aws_lb_controller.arn
+}
+
+resource "aws_iam_policy" "alb_acm_policy" {
+  name        = "AWSALBACMPolicy"
+  description = "Policy for ALB to access ACM for SSL certificates"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect    = "Allow"
+        Action    = [
+        "sts:AssumeRoleWithWebIdentity",
+        "acm:ListCertificates",
+        "elbv2:DescribeLoadBalancers",
+        "elbv2:DescribeTargetGroups",
+        "elbv2:DescribeListeners",
+        "elbv2:DescribeListenerCertificates",
+        "acm:DescribeCertificate"
+        ]
+        Resource  = "*"
+      },
+      {
+        Effect    = "Allow"
+        Action    = [
+          "sts:AssumeRoleWithWebIdentity"
+        ]
+        Resource  = "*"
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "alb_acm_policy_attach" {
+  role       = aws_iam_role.aws_lb_controller_role.name
+  policy_arn = aws_iam_policy.alb_acm_policy.arn
+}
