@@ -1,5 +1,5 @@
 resource "aws_secretsmanager_secret" "mysql_secret" {
-  name = "mysql-credentials4"
+  name = "mysql-credentials5"
 }
 
 resource "aws_secretsmanager_secret_version" "mysql_secret_version" {
