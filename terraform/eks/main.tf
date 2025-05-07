@@ -1,6 +1,6 @@
 # EKS Cluster
 resource "aws_eks_cluster" "cluster" {
-  name     = "my_eks"
+  name     = "eks"
   role_arn = aws_iam_role.eks_cluster_role.arn
 
   vpc_config {

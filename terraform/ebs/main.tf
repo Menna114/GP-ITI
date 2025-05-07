@@ -155,6 +155,7 @@ resource "aws_iam_policy" "alb_acm_policy" {
       {
         Effect    = "Allow"
         Action    = [
+          
         "sts:AssumeRoleWithWebIdentity",
         "acm:ListCertificates",
         "elbv2:DescribeLoadBalancers",
