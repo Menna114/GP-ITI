@@ -15,7 +15,7 @@ spec:
     targetRevision: HEAD
     path: kustomize/overlays
   destination:
-    server: https://148DC3AB04B06BAA6607C6CEA4028F78.gr7.us-east-1.eks.amazonaws.com
+    server: https://AEA270D479A24D0022F50DF320C4BDE9.gr7.us-east-1.eks.amazonaws.com
     namespace: default
   syncPolicy:
     automated:
